@@ -12,6 +12,19 @@ function App() {
   const [ currentStep, setCurrentStep ] = new useState(SYMBOL_X)
   const [ winnerSequence, setWinnerSequence ] = new useState()
 
+  const handleCellClick = (index) => {
+    if (cells[index]) return
+
+    const cellsCopy = [...cells];
+    cellsCopy[index] = currentStep;
+    const winner = computeWinner(cellsCopy);
+
+    setCells(cellsCopy);
+    setWinnerSequence(winner);
+    setCurrentStep(currentStep === SYMBOL_X ? SYMBOL_O : SYMBOL_X);
+    
+  }
+
   const getSymbolClassName = (symbol) => {
     if (symbol === SYMBOL_X) return 'symbol--x'
     else if (symbol === SYMBOL_O) return 'symbol--o'
@@ -43,30 +56,11 @@ function App() {
         return [a,b,c]
       }
     }
-    
-    return undefined
   }
 
-  const handleCellClick = (index) => {
-    if (cells[index] || winnerSequence) return;
+  
 
-    const newCells = [...cells];
-    newCells[index] = currentStep;
-    
-    // Сначала обновляем клетки
-    setCells(newCells);
-    
-    // Затем проверяем победителя на новых данных
-    const winner = computeWinner(newCells);
-    setWinnerSequence(winner);
-    
-    // Меняем игрока только если нет победителя
-    if (!winner) {
-      setCurrentStep(currentStep === SYMBOL_X ? SYMBOL_O : SYMBOL_X);
-    }
-  }
-
-  const winnerSymbol = winnerSequence ? cells[winnerSequence[0]] : undefined
+  const winnerSymbol = winnerSequence ? cells[winnerSequence?.[0]] : undefined
 
   return (
     <div className='game'>
@@ -79,7 +73,7 @@ function App() {
 
           return (
               <button key={index} className={ `cell ${isWinner ? 'cell--win' : ''} ` } onClick={ () => handleCellClick(index) }>{
-                symbol && renderSymbol(symbol)
+                symbol ? renderSymbol(symbol) : null
               }</button>
           ) 
         })}
